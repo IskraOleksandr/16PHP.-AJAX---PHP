@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table with Filters</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        .p-4it {
+            padding: 0.5rem 1rem 0.5rem 1rem;
+        }
+
+        .w-1_4n {
+            width: 30%;
+        }
+    </style>
+</head>
+
+<body class="bg-white text-black font-sans">
+<div class="container mx-auto p-4it">
+    <div class="flex">
+        <div class="w-1_4n p-4">
+            <div class="mb-4">
+                <p class="font-sans">Sort by name <a href="#" onclick="sortTable('Name', 'asc')" class="text-blue-500">Ascending</a> /
+                    <a href="#" onclick="sortTable('Salary', 'desc')" class="text-blue-500">Descending</a>
+                </p>
+            </div>
+            <div class="mb-4">
+                <p class="font-sans">Sort by surname <a href="#" onclick="sortTable('Surname', 'asc')" class="text-blue-500">Ascending</a> /
+                    <a href="#" onclick="sortTable('Salary', 'desc')" class="text-blue-500">Descending</a>
+                </p>
+            </div>
+            <div class="mb-4">
+                <p class="font-sans">Sort by country <a href="#" onclick="sortTable('Country', 'asc')" class="text-blue-500">Ascending</a> /
+                    <a href="#" onclick="sortTable('Salary', 'desc')" class="text-blue-500">Descending</a>
+                </p>
+            </div>
+            <div class="mb-4">
+                <p class="font-sans">Sort by city <a href="#" onclick="sortTable('City', 'asc')" class="text-blue-500">Ascending</a> /
+                    <a href="#" onclick="sortTable('Salary', 'desc')" class="text-blue-500">Descending</a>
+                </p>
+            </div>
+            <div class="mb-4">
+                <p class="font-sans">Sort by salary <a href="#" onclick="sortTable('Salary', 'asc')" class="text-blue-500">Ascending</a> /
+                    <a href="#" onclick="sortTable('Salary', 'desc')" class="text-blue-500">Descending</a>
+                </p>
+            </div>
+            <div class="mb-4">
+                <h2 class="font-bold">Country:</h2>
+                <div id="country-filter"></div>
+            </div>
+            <div class="mb-4">
+                <h2 class="font-bold">City:</h2>
+                <div id="city-filter"></div>
+            </div>
+        </div>
+        <div class="w-3/4 p-4">
+            <table class="table-auto w-full border-collapse border border-gray-400">
+                <thead>
+                <tr>
+                    <th class="border border-gray-400 p-2 bg-blue-200">Name</th>
+                    <th class="border border-gray-400 p-2 bg-blue-200">Surname</th>
+                    <th class="border border-gray-400 p-2 bg-blue-200">Country</th>
+                    <th class="border border-gray-400 p-2 bg-blue-200">City</th>
+                    <th class="border border-gray-400 p-2 bg-blue-200">Salary</th>
+                </tr>
+                </thead>
+                <tbody id="employee-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    let sortField = 'id';
+    let sortOrder = 'asc';
+    let selectedCountries = [];
+    let selectedCities = [];
+
+    $(document).ready(function () {
+        loadFilters(); // Загружаем фильтры при первой загрузке страницы
+        loadTable(); // Загружаем данные таблицы при первой загрузке страницы
+
+        $('#country-filter').on('change', 'input[type=checkbox]', function() {
+            updateSelectedFilters();
+            loadTable();
+        });
+
+        $('#city-filter').on('change', 'input[type=checkbox]', function() {
+            updateSelectedFilters();
+            loadTable();
+        });
+    });
+
+    function loadTable() {
+        const filters = getFilters();
+        $.ajax({
+            url: 'filter.php',
+            type: 'GET',
+            data: filters,
+            success: function (data) {
+                const filters = JSON.parse(data);
+                $('#employee-table-body').html(filters.data);
+            }
+        });
+    }
+
+    function loadFilters() {
+        $.ajax({
+            url: 'filters.php',
+            type: 'GET',
+            success: function (data) {
+                const filters = JSON.parse(data);
+                $('#country-filter').html(filters.countries);
+                $('#city-filter').html(filters.cities);
+                restoreSelectedFilters();
+            }
+        });
+    }
+
+    function getFilters() {
+        return {
+            countries: selectedCountries,
+            cities: selectedCities,
+            sortField: sortField,
+            sortOrder: sortOrder
+        };
+    }
+
+    function updateSelectedFilters() {
+        selectedCountries = $('#country-filter input[type=checkbox]:checked').map(function() {
+            return this.value;
+        }).get();
+
+        selectedCities = $('#city-filter input[type=checkbox]:checked').map(function() {
+            return this.value;
+        }).get();
+    }
+
+    function restoreSelectedFilters() {
+        $('#country-filter input[type=checkbox]').each(function() {
+            if (selectedCountries.includes(this.value)) {
+                this.checked = true;
+            }
+        });
+
+        $('#city-filter input[type=checkbox]').each(function() {
+            if (selectedCities.includes(this.value)) {
+                this.checked = true;
+            }
+        });
+    }
+
+    function sortTable(field, order) {
+        sortField = field;
+        sortOrder = order;
+        loadTable();
+    }
+</script>
+</body>
+
+</html>
