@@ -1,4 +1,5 @@
-AJAX и PHP
+--AJAX и PHP
+
 Создать в БД табличку с полями Name (text), Surname (text), 
 Country (text), City (text), Salary (integer) и записать туда 30 строк.
 Создать страницу, где отобразить содержимое этой таблички в теге <table>. 
