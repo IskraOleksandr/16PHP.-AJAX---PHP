@@ -1,15 +1,7 @@
 <?php
-//header('Content-Type: application/json');//
-$dsn = 'mysql:host=localhost;dbname=employees_db';
-$username = 'root';
-$password = '';
-$options = [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-];
 
 try {
-    $pdo = new PDO($dsn, $username, $password, $options);
+    $pdo = new PDO('mysql:host=127.0.0.1:3306;dbname=employees_db;charset=utf8', 'root', '');
 } catch (PDOException $e) {
     die('Connection failed: ' . $e->getMessage());
 }
